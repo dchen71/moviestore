@@ -10,6 +10,8 @@ class MoviesController < ApplicationController
   # GET /movies/1
   # GET /movies/1.json
   def show
+    @movie = Movie.find(params[:id])
+    @cart_action = @movie.cart_action current_user.try :id
   end
 
   # GET /movies/new
@@ -70,5 +72,13 @@ class MoviesController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def movie_params
       params.require(:movie).permit(:title, :relase_year, :price, :description, :imdb_id, :poster_url)
+    end
+
+    def cart_action(current_user_id)
+      if $redis.sismember "cart#{current_user_id}", id
+        "Remove from"
+      else
+        "Add to"
+      end
     end
 end
